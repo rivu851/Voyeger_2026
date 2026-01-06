@@ -36,7 +36,7 @@ const Emergency = () => {
 
   // Get user ID from JWT token
   const userId = getUserIdFromToken();
-  
+
   // Live location tracking hook
   const { isTracking, startTracking, stopTracking } = useLiveLocation(userId);
 
@@ -52,7 +52,7 @@ const Emergency = () => {
     const getLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(userCoords, showError, {
-          enableHighAccuracy: true,
+          enableHighAccuracy: false,
           timeout: 15000,
           maximumAge: 0,
         });
@@ -68,12 +68,17 @@ const Emergency = () => {
     try {
       const userLat = position.coords.latitude;
       const userLng = position.coords.longitude;
+
+      // UI-only state
       setLocation({ lat: userLat, lng: userLng });
-      await getDetails(userLat, userLng);
+
+      // UI helpers only
       getNearbyData(userLat, userLng);
+      getDetails(userLat, userLng);
+
       setLocationError(null);
-    } catch (error) {
-      setLocationError(error.message);
+    } catch (err) {
+      setLocationError("Failed to process location");
     } finally {
       setLoading(false);
     }
@@ -98,23 +103,49 @@ const Emergency = () => {
     setLoading(false);
   };
 
-  const getDetails = async (lat, long) => {
-    try {
-      const proxy = "https://api.allorigins.win/get?url=";
-      const api = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`;
-      const res = await fetch(proxy + encodeURIComponent(api));
-      const result = await res.json();
-      if (!result.contents) throw new Error("No address found");
-      const data = JSON.parse(result.contents);
-      setAddress(data.address);
-      setCurrentcity(
-        data.address.city || data.address.town || data.address.village || ""
-      );
-    } catch (error) {
-      console.error("Address fetch failed:", error);
-      setLocationError("Address fetch failed.");
-    }
-  };
+  // const getDetails = async (lat, long) => {
+  //   try {
+  //     const proxy = "https://api.allorigins.win/get?url=";
+  //     const api = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${long}&format=json`;
+  //     const res = await fetch(proxy + encodeURIComponent(api));
+  //     const result = await res.json();
+  //     if (!result.contents || !result.contents.trim().startsWith("{")) {
+  //       throw new Error("Invalid geocoding response");
+  //     }
+  //     const data = JSON.parse(result.contents);
+  //     setAddress(data.address);
+  //     setCurrentcity(
+  //       data.address.city || data.address.town || data.address.village || ""
+  //     );
+  //   } catch (error) {
+  //     console.error("Address fetch failed:", error);
+  //     setLocationError("Address fetch failed.");
+  //   }
+  // };
+
+    const getDetails = async (lat, lng) => {
+  try {
+    const res = await fetch(
+      `http://localhost:5000/api/loc-get-details/reverse-geocode?lat=${lat}&lon=${lng}`
+    );
+
+    if (!res.ok) throw new Error("Geocode failed");
+
+    const data = await res.json();
+
+    setAddress(data.address);
+    setCurrentcity(
+      data.address?.city ||
+      data.address?.town ||
+      data.address?.village ||
+      ""
+    );
+  } catch (err) {
+    console.error("Address fetch failed:", err);
+    setLocationError("Address fetch failed");
+  }
+};
+
 
   const getNearbyData = (lat, lng) => {
     try {
@@ -169,24 +200,26 @@ const Emergency = () => {
     try {
       // Start live location tracking
       const trackingStarted = startTracking();
-      
+
       if (trackingStarted) {
         // Generate WhatsApp link with live tracking
         const whatsappUrl = getWhatsappLinkWithTracking(
-          phoneNumber, 
-          userId, 
-          location?.lat, 
+          phoneNumber,
+          userId,
+          location?.lat,
           location?.lng
         );
-        
+
         // Open WhatsApp in new tab
-        window.open(whatsappUrl, '_blank');
-        
-        toast.success(`Live tracking started! WhatsApp opened for ${contactType}`);
+        window.open(whatsappUrl, "_blank");
+
+        toast.success(
+          `Live tracking started! WhatsApp opened for ${contactType}`
+        );
       }
     } catch (error) {
-      console.error('Error starting emergency tracking:', error);
-      toast.error('Failed to start emergency tracking');
+      console.error("Error starting emergency tracking:", error);
+      toast.error("Failed to start emergency tracking");
     }
   };
 
@@ -219,53 +252,64 @@ const Emergency = () => {
 
       {/* Notify Contacts */}
       <div className="bg-yellow-50 p-6 rounded-2xl shadow border border-yellow-200 mb-6 w-full max-w-4xl text-center">
-        <h3 className="text-xl font-bold text-yellow-800 mb-4">🧑‍🤝‍🧑 Notify Contacts</h3>
+        <h3 className="text-xl font-bold text-yellow-800 mb-4">
+          🧑‍🤝‍🧑 Notify Contacts
+        </h3>
         <div className="flex flex-wrap justify-center gap-4">
           {emergencyContacts && (
             <>
               {emergencyContacts.mom && (
                 <button
-                  onClick={() => handleEmergencyContact('Mom', emergencyContacts.mom)}
+                  onClick={() =>
+                    handleEmergencyContact("Mom", emergencyContacts.mom)
+                  }
                   className={`px-4 py-2 rounded transition ${
-                    isTracking 
-                      ? 'bg-red-600 text-white hover:bg-red-700' 
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                    isTracking
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-green-600 text-white hover:bg-green-700"
                   }`}
                   disabled={isTracking}
                 >
-                  {isTracking ? '🔄 Tracking Active' : '💬 Mom'}
+                  {isTracking ? "🔄 Tracking Active" : "💬 Mom"}
                 </button>
               )}
               {emergencyContacts.dad && (
                 <button
-                  onClick={() => handleEmergencyContact('Dad', emergencyContacts.dad)}
+                  onClick={() =>
+                    handleEmergencyContact("Dad", emergencyContacts.dad)
+                  }
                   className={`px-4 py-2 rounded transition ${
-                    isTracking 
-                      ? 'bg-red-600 text-white hover:bg-red-700' 
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                    isTracking
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-green-600 text-white hover:bg-green-700"
                   }`}
                   disabled={isTracking}
                 >
-                  {isTracking ? '🔄 Tracking Active' : '💬 Dad'}
+                  {isTracking ? "🔄 Tracking Active" : "💬 Dad"}
                 </button>
               )}
               {emergencyContacts.friend && (
                 <button
-                  onClick={() => handleEmergencyContact('Best Friend', emergencyContacts.friend)}
+                  onClick={() =>
+                    handleEmergencyContact(
+                      "Best Friend",
+                      emergencyContacts.friend
+                    )
+                  }
                   className={`px-4 py-2 rounded transition ${
-                    isTracking 
-                      ? 'bg-red-600 text-white hover:bg-red-700' 
-                      : 'bg-green-600 text-white hover:bg-green-700'
+                    isTracking
+                      ? "bg-red-600 text-white hover:bg-red-700"
+                      : "bg-green-600 text-white hover:bg-green-700"
                   }`}
                   disabled={isTracking}
                 >
-                  {isTracking ? '🔄 Tracking Active' : '💬 Best Friend'}
+                  {isTracking ? "🔄 Tracking Active" : "💬 Best Friend"}
                 </button>
               )}
             </>
           )}
         </div>
-        
+
         {/* Stop Tracking Button */}
         {isTracking && (
           <div className="mt-4">
@@ -299,11 +343,16 @@ const Emergency = () => {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-semibold text-gray-800">📍 Your Current Location</h2>
+              <h2 className="text-2xl font-semibold text-gray-800">
+                📍 Your Current Location
+              </h2>
               <p className="text-xs text-gray-600 mt-1">
-                📌 Latitude: {location?.lat?.toFixed(6)}, Longitude: {location?.lng?.toFixed(6)}
+                📌 Latitude: {location?.lat?.toFixed(6)}, Longitude:{" "}
+                {location?.lng?.toFixed(6)}
               </p>
-              <p className="text-gray-600 text-sm md:text-base px-4">{formatAddress()}</p>
+              <p className="text-gray-600 text-sm md:text-base px-4">
+                {formatAddress()}
+              </p>
               <a
                 href={`https://www.google.com/maps?q=${location?.lat},${location?.lng}`}
                 target="_blank"
@@ -322,18 +371,28 @@ const Emergency = () => {
         <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
           {/* Hospitals */}
           <div className="bg-red-50 p-6 rounded-2xl shadow border border-red-200 space-y-4">
-            <h3 className="text-xl font-bold text-red-700 text-center">🏥 Nearest Hospitals</h3>
+            <h3 className="text-xl font-bold text-red-700 text-center">
+              🏥 Nearest Hospitals
+            </h3>
             {nearbyHospitals.length > 0 ? (
               nearbyHospitals.map((item, index) => (
                 <div
                   key={index}
                   className="bg-white/80 backdrop-blur rounded-xl p-4 border hover:shadow-lg transition"
                 >
-                  <h4 className="text-lg font-semibold">{item["Hospital Name"]}</h4>
+                  <h4 className="text-lg font-semibold">
+                    {item["Hospital Name"]}
+                  </h4>
                   <p className="text-sm text-gray-600 mt-1">{item.Address}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.distance.toFixed(1)} km away</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {item.distance.toFixed(1)} km away
+                  </p>
                   <a
-                    href={getWhatsappLink(item["Phone Number"], item.Latitude, item.Longitude)}
+                    href={getWhatsappLink(
+                      item["Phone Number"],
+                      item.Latitude,
+                      item.Longitude
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 inline-block bg-green-600 text-white rounded py-1.5 px-4 text-sm hover:bg-green-700 transition"
@@ -343,13 +402,17 @@ const Emergency = () => {
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-500">No hospitals found nearby.</p>
+              <p className="text-center text-gray-500">
+                No hospitals found nearby.
+              </p>
             )}
           </div>
 
           {/* Police */}
           <div className="bg-blue-50 p-6 rounded-2xl shadow border border-blue-200 space-y-4">
-            <h3 className="text-xl font-bold text-blue-700 text-center">🚓 Nearest Police Stations</h3>
+            <h3 className="text-xl font-bold text-blue-700 text-center">
+              🚓 Nearest Police Stations
+            </h3>
             {nearbyPoliceStations.length > 0 ? (
               nearbyPoliceStations.map((item, index) => (
                 <div
@@ -360,9 +423,15 @@ const Emergency = () => {
                     {item["Police Station Name"] || "Police Station"}
                   </h4>
                   <p className="text-sm text-gray-600 mt-1">{item.Address}</p>
-                  <p className="text-xs text-gray-500 mt-1">{item.distance.toFixed(1)} km away</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {item.distance.toFixed(1)} km away
+                  </p>
                   <a
-                    href={getWhatsappLink(item["Phone Number"], item.Latitude, item.Longitude)}
+                    href={getWhatsappLink(
+                      item["Phone Number"],
+                      item.Latitude,
+                      item.Longitude
+                    )}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-2 inline-block bg-green-600 text-white rounded py-1.5 px-4 text-sm hover:bg-green-700 transition"
@@ -372,12 +441,14 @@ const Emergency = () => {
                 </div>
               ))
             ) : (
-              <p className="text-center text-gray-500">No police stations found nearby.</p>
+              <p className="text-center text-gray-500">
+                No police stations found nearby.
+              </p>
             )}
           </div>
         </div>
       )}
-      
+
       {/* Toast Container */}
       <div className="fixed bottom-4 right-4 z-50">
         <div id="toast-container"></div>
