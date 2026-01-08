@@ -3,62 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voyager | Virtual Tour Guide</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Voyager | Virtual Tour</title>
+    <style>
+        :root { --primary: #2d3436; --accent: #0984e3; --bg: #f5f6fa; --text: #2d3436; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; line-height: 1.6; }
+        
+        /* Navigation */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 5%; background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
+        nav h1 { margin: 0; cursor: pointer; color: var(--accent); letter-spacing: -1px; }
+        .search-container input { padding: 10px 20px; border-radius: 25px; border: 1px solid #ddd; width: 250px; outline: none; transition: 0.3s; }
+        .search-container input:focus { border-color: var(--accent); box-shadow: 0 0 8px rgba(9,132,227,0.2); }
+
+        /* Gallery View */
+        main { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; }
+        .card { background: #fff; border-radius: 16px; overflow: hidden; cursor: pointer; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #eee; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 20px; }
+        .card h3 { margin: 0 0 10px 0; }
+        .card p { font-size: 0.9rem; color: #636e72; margin: 0; }
+
+        /* Tour View */
+        .tour-layout { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; }
+        .media-box { position: sticky; top: 100px; }
+        .media-box img { width: 100%; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); object-fit: cover; aspect-ratio: 16/9; }
+        .audio-player { margin-top: 20px; background: #fff; padding: 15px; border-radius: 12px; display: flex; align-items: center; gap: 10px; }
+        audio { width: 100%; height: 35px; }
+
+        .content-box { background: #fff; padding: 40px; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        .vibe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        select#vibe-selector { padding: 10px; border-radius: 8px; border: 1px solid #ddd; font-weight: 600; cursor: pointer; }
+
+        .path-group { display: flex; flex-direction: column; gap: 12px; margin-top: 30px; }
+        .btn-next { padding: 15px 25px; background: var(--accent); color: white; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; text-align: left; display: flex; justify-content: space-between; }
+        .btn-next:hover { filter: brightness(1.1); transform: translateX(5px); }
+        
+        .hidden { display: none; }
+        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #636e72; font-weight: 500; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <header>
-        <h1 onclick="location.reload()">VOYAGER</h1>
-        <div class="search-container" id="searchBar">
-            <input type="text" id="monumentSearch" placeholder="Search monuments...">
+
+    <nav>
+        <h1 onclick="showGallery()">VOYAGER.</h1>
+        <div class="search-container">
+            <input type="text" id="monumentSearch" placeholder="Search a monument..." onkeyup="filterMonuments()">
         </div>
-    </header>
+    </nav>
 
     <main id="app">
-        <section id="gallery" class="view">
-            <h2>Select a Destination</h2>
-            <div id="monumentGrid" class="grid"></div>
+        <section id="gallery-view">
+            <h2 style="font-size: 2rem; margin-bottom: 30px;">Discover History</h2>
+            <div id="monument-grid" class="grid">
+                </div>
         </section>
 
-        <section id="tour" class="view hidden">
-            <button class="back-btn" onclick="showGallery()">← Back to Gallery</button>
+        <section id="tour-view" class="hidden">
+            <span class="back-link" onclick="showGallery()">← Exit Tour</span>
             
-            <div class="tour-header">
-                <h2 id="monumentTitle"></h2>
-                <div class="vibe-selector">
-                    <label>Choose Vibe:</label>
-                    <select id="vibePicker">
-                        <option value="professor">🎓 Professor</option>
-                        <option value="local">🏠 Local</option>
-                        <option value="fun">🎉 Fun</option>
-                        <option value="cynical">💀 Cynical</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="frameDisplay" class="frame-card">
-                <img id="frameImage" src="" alt="Frame Image">
-                <div class="content">
-                    <h3 id="frameTitle"></h3>
-                    <p id="narrationText"></p>
+            <div class="tour-layout">
+                <div class="media-box">
+                    <img id="display-image" src="" alt="View">
                     <div class="audio-player">
-                        <audio id="frameAudio" controls></audio>
+                        <audio id="narration-audio" controls></audio>
+
                     </div>
                 </div>
-            </div>
 
-            <div id="navigation">
-                <h4>Where to next?</h4>
-                <div id="pathButtons" class="btn-group"></div>
-            </div>
+                <div class="content-box">
+                    <div class="vibe-header">
+                        <h2 id="display-title" style="margin:0">Monument Name</h2>
+                        <select id="vibe-selector">
+                            <option value="professor">🎓 Professor</option>
+                            <option value="local">🏠 Local</option>
+                            <option value="fun">🎉 Fun</option>
+                            <option value="cynical">💀 Cynical</option>
+                        </select>
+                    </div>
 
-            <div id="endTour" class="hidden">
-                <p>You have reached the end of this journey.</p>
-                <button onclick="showGallery()">Finish Tour</button>
+                    <p id="display-description" class="description" style="font-size: 1.15rem; color: #444; min-height: 150px;"></p>
+
+                    <div id="path-section">
+                        <h4 style="color: #b2bec3; text-transform: uppercase; letter-spacing: 1px; font-size: 0.8rem;">Your Path</h4>
+                        <div id="path-buttons" class="path-group"></div>
+                    </div>
+                    
+                    <div id="end-message" class="hidden" style="text-align: center; padding: 40px 0;">
+                        <h3 style="color: #00b894;">Tour Complete ✓</h3>
+                        <p>You have explored all frames in this location.</p>
+                        <button onclick="showGallery()" class="btn-next" style="display:inline-block; margin-top:10px">Explore Another</button>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
 
-    <script src="script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
