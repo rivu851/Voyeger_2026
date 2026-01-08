@@ -35,6 +35,7 @@ import HotelApp from "./ownersec/HotelApp";
 import ProtectedRoute from "./components/protectedRoute";
 import SouBooking_App from "./SouBooking_App";
 import VendorApp from "./vendorsec/lib/VendorApp";
+import Monuments from "./components/Monuments";
 
 const App = () => {
   const { user } = useAppContext();
@@ -101,6 +102,8 @@ const App = () => {
             <Route path="/digha" element={<Digha />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Signup />} />
+            <Route path="/monuments" element={<Monuments />} />
+            
           </Routes>
           <Testimonials />
           <Footer />

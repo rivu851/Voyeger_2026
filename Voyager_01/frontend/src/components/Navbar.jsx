@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FaTimes } from "react-icons/fa";
-import { useTranslation } from "react-i18next";
-import LanguageChanger from "./LanguageChanger";
-import { useAppContext } from "../context/AppContext";
-import Profile from "../pages/Profile";
+"use client"
+
+import { useState, useEffect } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom"
+import { FaTimes } from "react-icons/fa"
+import { useTranslation } from "react-i18next"
+import LanguageChanger from "./LanguageChanger"
+import { useAppContext } from "../context/AppContext"
+import Profile from "../pages/Profile"
+
 const searchDestinations = [
   { name: "Bishnupur", path: "/bishupur" },
   { name: "Doars", path: "/doars" },
@@ -20,82 +23,78 @@ const searchDestinations = [
   { name: "Paris", path: "/paris" },
   { name: "Kerala", path: "/kerala" },
   { name: "Andaman", path: "/andaman" },
-  { name: "Digha", path: "/digha" }, // ✅ fixed lowercase "path"
-];
+  { name: "Digha", path: "/digha" },
+  { name: "Monuments", path: "/monuments" },
+]
+
+const sidebarItemsMapping = [
+  { label: "navbar.sidebarItems.home", path: "/home" },
+  { label: "navbar.sidebarItems.weather", path: "/weather" },
+  { label: "navbar.sidebarItems.map", path: "/map" },
+  { label: "navbar.sidebarItems.booking", path: "/booking" },
+  { label: "navbar.sidebarItems.community", path: "/community" },
+  { label: "navbar.sidebarItems.emergency", path: "/emergency" },
+  { label: "navbar.sidebarItems.contact", path: "/contact" },
+  { label: "navbar.sidebarItems.monuments", path: "/monuments" },
+]
 
 const Navbar = () => {
-  const {
-    profileOpen,
-    setProfileOpen,
-    sidebarOpen,
-    setSidebarOpen,
-    userDetails,
-  } = useAppContext();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { user } = useAppContext();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
-  const [showResults, setShowResults] = useState(false);
-
-  const sidebarItems = [
-    t("navbar.sidebarItems.home"),
-    t("navbar.sidebarItems.weather"),
-    t("navbar.sidebarItems.map"),
-    t("navbar.sidebarItems.booking"),
-    t("navbar.sidebarItems.community"),
-    t("navbar.sidebarItems.emergency"),
-    t("navbar.sidebarItems.contact"),
-  ];
+  const { profileOpen, setProfileOpen, sidebarOpen, setSidebarOpen, userDetails } = useAppContext()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { t } = useTranslation()
+  const { user } = useAppContext()
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState([])
+  const [showResults, setShowResults] = useState(false)
 
   // Handle search input changes
   const handleSearchChange = (e) => {
-    const query = e.target.value;
-    setSearchQuery(query);
+    const query = e.target.value
+    setSearchQuery(query)
 
     if (query.length > 0) {
       const results = searchDestinations.filter((destination) =>
-        destination.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setSearchResults(results);
-      setShowResults(true);
+        destination.name.toLowerCase().includes(query.toLowerCase()),
+      )
+      setSearchResults(results)
+      setShowResults(true)
     } else {
-      setSearchResults([]);
-      setShowResults(false);
+      setSearchResults([])
+      setShowResults(false)
     }
-  };
+  }
   // Handle search submission
   const handleSearchSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     if (searchResults.length > 0) {
-      navigate(searchResults[0].path);
-      setSearchQuery("");
-      setShowResults(false);
+      navigate(searchResults[0].path)
+      setSearchQuery("")
+      setShowResults(false)
     }
-  };
+  }
 
   // Handle clicking on a search result
   const handleResultClick = (path) => {
-    navigate(path);
-    window.scrollTo(0, 0);
-    setSearchQuery("");
-    setShowResults(false);
-  };
+    navigate(path)
+    window.scrollTo(0, 0)
+    setSearchQuery("")
+    setShowResults(false)
+  }
 
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       if (showResults) {
-        setShowResults(false);
+        setShowResults(false)
       }
-    };
+    }
 
-    document.addEventListener("click", handleClickOutside);
+    document.addEventListener("click", handleClickOutside)
     return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [showResults]);
+      document.removeEventListener("click", handleClickOutside)
+    }
+  }, [showResults])
 
   return (
     <>
@@ -112,27 +111,15 @@ const Navbar = () => {
             >
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${
-                  sidebarOpen
-                    ? "top-1/2 transform -translate-y-1/2 rotate-45"
-                    : "top-1/4"
-                }`}
+                ${sidebarOpen ? "top-1/2 transform -translate-y-1/2 rotate-45" : "top-1/4"}`}
               ></span>
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${
-                  sidebarOpen
-                    ? "opacity-0"
-                    : "top-1/2 transform -translate-y-1/2"
-                }`}
+                ${sidebarOpen ? "opacity-0" : "top-1/2 transform -translate-y-1/2"}`}
               ></span>
               <span
                 className={`absolute left-0 w-full h-0.5 bg-white rounded-full transition-all duration-300 ease-in-out 
-                ${
-                  sidebarOpen
-                    ? "top-1/2 transform -translate-y-1/2 -rotate-45"
-                    : "top-3/4"
-                }`}
+                ${sidebarOpen ? "top-1/2 transform -translate-y-1/2 -rotate-45" : "top-3/4"}`}
               ></span>
             </button>
 
@@ -260,7 +247,7 @@ const Navbar = () => {
                 aria-label={t("navbar.profileButton")}
               >
                 <img
-                  src={userDetails?.avatarUrl}
+                  src={userDetails?.avatarUrl || "/placeholder.svg"}
                   alt={t("navbar.profileImageAlt")}
                   className="w-full h-full object-cover"
                 />
@@ -358,33 +345,29 @@ const Navbar = () => {
 
           {/* Sidebar Links */}
           <ul className="space-y-3 flex-1 overflow-y-auto">
-            {sidebarItems.map((item, index) => (
+            {sidebarItemsMapping.map((item, index) => (
               <li
                 key={index}
                 className="transition-all duration-500 ease-out"
                 style={{
-                  transform: sidebarOpen
-                    ? "translateX(0)"
-                    : "translateX(-20px)",
+                  transform: sidebarOpen ? "translateX(0)" : "translateX(-20px)",
                   opacity: sidebarOpen ? 1 : 0,
                   transitionDelay: `${index * 80}ms`,
                 }}
               >
                 <Link
-                  to={user == null ? "/login" : `/${item.toLowerCase()}`}
+                  to={user == null ? "/login" : item.path}
                   className={`flex items-center px-4 py-3 rounded-lg 
                     hover:bg-gray-700/50 hover:text-cyan-400 transition-all duration-300
                     ${
-                      location.pathname === `/${item.toLowerCase()}`
-                        ? "bg-gray-700/50 text-cyan-400 font-semibold"
-                        : "text-gray-300"
+                      location.pathname === item.path ? "bg-gray-700/50 text-cyan-400 font-semibold" : "text-gray-300"
                     }`}
                   onClick={() => {
-                    setSidebarOpen(false);
-                    scroll(0, 0);
+                    setSidebarOpen(false)
+                    window.scrollTo(0, 0)
                   }}
                 >
-                  <span className="flex-1 text-left">{item}</span>
+                  <span className="flex-1 text-left">{t(item.label)}</span>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="h-5 w-5"
@@ -392,12 +375,7 @@ const Navbar = () => {
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
               </li>
@@ -422,8 +400,7 @@ const Navbar = () => {
       {/* Profile Slideout */}
       <Profile isOpen={profileOpen} onClose={() => setProfileOpen(false)} />
     </>
-  );
-};
+  )
+}
 
-export default Navbar;
-
+export default Navbar
