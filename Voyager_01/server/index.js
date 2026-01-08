@@ -17,6 +17,8 @@ const orderRouter = require("./routes/orderRoute");
 const bookingrouter = require("./routes/bookingroute");
 const souvenirrouter = require("./routes/souvenirroute");
 const locationRoutes = require("./routes/location");
+const monumentRoutes = require("./routes/monumentroutes");
+const frameRoutes = require("./routes/frameroute");
 const { startCleanupScheduler } = require("./utils/cleanup");
 
 // Connect to Database & Cloudinary
@@ -63,6 +65,9 @@ app.use("/api/bookings", bookingrouter);
 app.use("/api/souvenirs", souvenirrouter);
 app.use("/api/location", locationRoutes);
 app.use("/api/owner/hotel", ownerHotelRoutes);
+app.use("/api/monuments", monumentRoutes);
+app.use("/api/frames", frameRoutes);
+
 app.use("/api/loc-get-details", async (req, res) => {
   try {
     const { lat, lon } = req.query;

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voyager | Virtual Tour Guide</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1 onclick="location.reload()">VOYAGER</h1>
+        <div class="search-container" id="searchBar">
+            <input type="text" id="monumentSearch" placeholder="Search monuments...">
+        </div>
+    </header>
+
+    <main id="app">
+        <section id="gallery" class="view">
+            <h2>Select a Destination</h2>
+            <div id="monumentGrid" class="grid"></div>
+        </section>
+
+        <section id="tour" class="view hidden">
+            <button class="back-btn" onclick="showGallery()">← Back to Gallery</button>
+            
+            <div class="tour-header">
+                <h2 id="monumentTitle"></h2>
+                <div class="vibe-selector">
+                    <label>Choose Vibe:</label>
+                    <select id="vibePicker">
+                        <option value="professor">🎓 Professor</option>
+                        <option value="local">🏠 Local</option>
+                        <option value="fun">🎉 Fun</option>
+                        <option value="cynical">💀 Cynical</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="frameDisplay" class="frame-card">
+                <img id="frameImage" src="" alt="Frame Image">
+                <div class="content">
+                    <h3 id="frameTitle"></h3>
+                    <p id="narrationText"></p>
+                    <div class="audio-player">
+                        <audio id="frameAudio" controls></audio>
+                    </div>
+                </div>
+            </div>
+
+            <div id="navigation">
+                <h4>Where to next?</h4>
+                <div id="pathButtons" class="btn-group"></div>
+            </div>
+
+            <div id="endTour" class="hidden">
+                <p>You have reached the end of this journey.</p>
+                <button onclick="showGallery()">Finish Tour</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
