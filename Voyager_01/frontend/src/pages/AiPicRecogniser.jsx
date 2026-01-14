@@ -35,7 +35,7 @@ export default function ImageAnalyzer() {
     setResults(null);
 
     try {
-      const res = await fetch("http://localhost:5000/api/ai/aiImageAnalyser", {
+      const res = await fetch("https://voyeger2026-backend.onrender.com/api/ai/aiImageAnalyser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

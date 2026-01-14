@@ -65,7 +65,7 @@ export function AddSouvenirDialog({
       images.forEach((image) => formData.append("imageFile", image));
 
       const res = await axios.post(
-        "http://localhost:5000/api/createsouvenir",
+        "https://voyeger2026-backend.onrender.com/api/createsouvenir",
         formData,
         {
           headers: {

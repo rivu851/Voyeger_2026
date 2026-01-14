@@ -40,7 +40,7 @@ function Signup() {
       NProgress.start();
 
       await axios.post(
-        "http://localhost:5000/api/users/register",
+        "https://voyeger2026-backend.onrender.com/api/users/register",
         signupInfo,
         {
           headers: { "Content-Type": "application/json" },

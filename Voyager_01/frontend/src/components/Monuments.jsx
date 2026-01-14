@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { ChevronLeft, Headphones, MapPin, ArrowRight } from "lucide-react"
 
-const API_BASE = "http://localhost:5000/api"
+const API_BASE = "https://voyeger2026-backend.onrender.com/api"
 
 export default function Monuments() {
   // Views: 'gallery', 'overview', 'tour'

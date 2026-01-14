@@ -45,7 +45,7 @@ function Login() {
       NProgress.start(); // start top progress bar
 
       const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "https://voyeger2026-backend.onrender.com/api/users/login",
         loginInfo,
         {
           headers: { "Content-Type": "application/json" },

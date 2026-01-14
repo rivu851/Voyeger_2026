@@ -23,7 +23,7 @@ export function useVendorData() {
         // Fetch souvenirs and orders in parallel
         const [souvenirResponse, ordersResponse] = await Promise.all([
           axios.get(
-            `http://localhost:5000/api/souvenirs/vendor/${encodeURIComponent(
+            `https://voyeger2026-backend.onrender.com/api/souvenirs/vendor/${encodeURIComponent(
               vendorName
             )}`,
             {
@@ -32,7 +32,7 @@ export function useVendorData() {
               },
             }
           ),
-          axios.get("http://localhost:5000/api/souvenirs/orders", {
+          axios.get("https://voyeger2026-backend.onrender.com/api/souvenirs/orders", {
             headers: {
               Authorization: `Bearer ${user.token}`,
             },

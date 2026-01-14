@@ -229,7 +229,7 @@ export function SouvenirManagement({ souvenirs, setSouvenirs }) {
     async function fetchSouvenirs() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/souvenirs/vendor/${encodeURIComponent(vendorName)}`
+          `https://voyeger2026-backend.onrender.com/api/souvenirs/vendor/${encodeURIComponent(vendorName)}`
         )
         setSouvenirs(response.data.data)
       } catch (error) {
