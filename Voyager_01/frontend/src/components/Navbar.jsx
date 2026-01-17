@@ -35,7 +35,7 @@ const sidebarItemsMapping = [
   { label: "navbar.sidebarItems.community", path: "/community" },
   { label: "navbar.sidebarItems.emergency", path: "/emergency" },
   { label: "navbar.sidebarItems.contact", path: "/contact" },
-  { label: "navbar.sidebarItems.monuments", path: "/monuments" },
+  { label: "Monuments", path: "/monuments" },
 ]
 
 const Navbar = () => {
