@@ -19,6 +19,7 @@ const souvenirrouter = require("./routes/souvenirroute");
 const locationRoutes = require("./routes/location");
 const monumentRoutes = require("./routes/monumentroutes");
 const frameRoutes = require("./routes/frameroute");
+const emergencyrouter = require("./routes/emergencyroutes");
 const { startCleanupScheduler } = require("./utils/cleanup");
 
 // Connect to Database & Cloudinary
@@ -67,7 +68,10 @@ app.use("/api/location", locationRoutes);
 app.use("/api/owner/hotel", ownerHotelRoutes);
 app.use("/api/monuments", monumentRoutes);
 app.use("/api/frames", frameRoutes);
+app.use("/api/emergency", emergencyrouter);
 
+
+//convert coordinate into adress using open street map's nominatim reverse geocoding API
 app.use("/api/loc-get-details", async (req, res) => {
   try {
     const { lat, lon } = req.query;

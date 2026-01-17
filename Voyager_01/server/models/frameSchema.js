@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Monument = require("./monumentSchema");
 
 const frameSchema = new mongoose.Schema({
-  monumentId: {
+  monumentId: { 
     type: mongoose.Schema.Types.ObjectId,
     ref: "Monument",
     required: true,

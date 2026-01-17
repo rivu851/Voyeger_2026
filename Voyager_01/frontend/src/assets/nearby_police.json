@@ -4,7 +4,7 @@
         "Police Station Name": "Alipore",
         "Phone Number": "033-2479 1021 / 6292258109",
         "Address": "8,Belvedere Road,Kol-27",
-        "Latitude": "22.5356° N",
+        "Latitude": "22.5356° N", 
         "Longitude": "88.3369° E"
     },
     {
@@ -695,7 +695,7 @@
         "Latitude": "22.541944",
         "Longitude": "88.326472"
     },
-    {
+    { 
         "Index": "88",
         "Police Station Name": "West Port",
         "Phone Number": "6292258504 / 033-2439 3617",
