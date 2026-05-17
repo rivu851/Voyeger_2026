@@ -131,6 +131,54 @@ app.get("/api/loc-get-details/reverse-geocode", async (req, res, next) => {
 });
 // app.use("/api/hotels", hotelRouter); // Uncomment if needed
 
+
+
+//move this api to routes and controllers later
+app.get("/api/tourist-spots", async (req, res, next) => {
+  try {
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({
+        success: false,
+        message: "lat & lon required",
+      });
+    }
+
+    const overpassQuery = `
+      [out:json][timeout:25];
+      (
+        node["tourism"]["wikidata"](around:15000,${lat},${lon});
+        way["tourism"]["wikidata"](around:15000,${lat},${lon});
+        relation["tourism"]["wikidata"](around:15000,${lat},${lon});
+      );
+      out center;
+    `;
+
+    const response = await fetch(
+      "https://overpass-api.de/api/interpreter",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain",
+          "User-Agent": "Voyager2026/1.0",
+        },
+        body: overpassQuery,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Overpass API failed");
+    }
+
+    const data = await response.json();
+
+    res.json(data);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // ─── Track Page ──────────────────────────────────────────────────────────────
 app.get("/track/:userId", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

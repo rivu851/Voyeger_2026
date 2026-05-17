@@ -93,12 +93,10 @@ const MapPage = () => {
       out center;
     `;
 
-    fetch(
-      `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(
-        overpassQuery
-      )}`,
-      { signal: controller.signal }
-    )
+  fetch(
+  `${import.meta.env.VITE_BACKEND_URL}/api/tourist-spots?lat=${coords.lat}&lon=${coords.lng}`,
+  { signal: controller.signal }
+)
       .then((res) => res.json())
       .then((data) => {
         const spots = data.elements
