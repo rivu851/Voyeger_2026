@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const cors = require("cors");
+const morgan = require("morgan");
 const path = require("path");
 
 
@@ -30,6 +31,24 @@ connectClodinary();
 startCleanupScheduler();
 
 const app = express();
+
+// ─── Request / Response Logger ───────────────────────────────────────────────
+app.use(morgan("dev")); // concise colored logs in dev
+
+app.use((req, res, next) => {
+  const start = Date.now();
+
+  console.log(`📥 ${req.method} ${req.originalUrl}`);
+
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(
+      `📤 ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`
+    );
+  });
+
+  next();
+});
 
 // 🔓 CORS Setup - Allow All Origins (Use this for development or Vercel deployment)
 app.use(
@@ -71,41 +90,80 @@ app.use("/api/frames", frameRoutes);
 app.use("/api/emergency", emergencyrouter);
 
 
-//convert coordinate into adress using open street map's nominatim reverse geocoding API
-app.use("/api/loc-get-details", async (req, res) => {
+// Convert coordinates to address using OpenStreetMap Nominatim reverse geocoding API
+app.get("/api/loc-get-details/reverse-geocode", async (req, res, next) => {
   try {
     const { lat, lon } = req.query;
 
     if (!lat || !lon) {
-      return res.status(400).json({ error: "lat & lon required" });
+      return res.status(400).json({
+        success: false,
+        error: "lat & lon required",
+      });
     }
 
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
-      {
-        headers: {
-          "User-Agent": "EmergencyApp/1.0 (contact: rajdeep3002@gmail.com)",
-        },
-      }
-    );
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
 
-    const data = await response.json();
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Voyager2026/1.0 (rajdeep3002@gmail.com)",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Nominatim API failed: ${response.status}`);
+    }
+
+    const text = await response.text();
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.error("Invalid JSON from Nominatim:", text);
+      throw new Error("Invalid geocoding response");
+    }
+
     res.json(data);
   } catch (err) {
-    console.error("Reverse geocode failed:", err);
-    res.status(500).json({ error: "Reverse geocoding failed" });
+    next(err);
   }
 });
 // app.use("/api/hotels", hotelRouter); // Uncomment if needed
 
-// Start Server
-const PORT = process.env.PORT || 5000;
-
-
+// ─── Track Page ──────────────────────────────────────────────────────────────
 app.get("/track/:userId", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "public", "index.html")
-  );
+  res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
+// ─── 404 Handler ─────────────────────────────────────────────────────────────
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: "Route not found",
+  });
+});
+
+// ─── Global Error Handler ─────────────────────────────────────────────────────
+// Must be defined with 4 args so Express recognises it as an error handler
+app.use((err, req, res, next) => {
+  console.error("💥 GLOBAL ERROR:", err);
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
+// ─── Crash Safety ─────────────────────────────────────────────────────────────
+process.on("unhandledRejection", (err) => {
+  console.error("UNHANDLED REJECTION 💥", err);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION 💥", err);
+});
+
+// ─── Start Server ─────────────────────────────────────────────────────────────
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
