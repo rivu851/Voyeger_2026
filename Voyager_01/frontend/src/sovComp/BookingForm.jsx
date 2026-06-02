@@ -92,7 +92,7 @@ export default function BookingForm({ souvenir, onBack, onBookingComplete }) {
     console.log("💳 Frontend: Making API call to /api/souvenirs/create-order");
     
     try {
-      const res = await fetch("http://localhost:5000/api/souvenirs/create-order", {
+      const res = await fetch("https://voyeger2026-backend.onrender.com/api/souvenirs/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -207,7 +207,7 @@ export default function BookingForm({ souvenir, onBack, onBookingComplete }) {
       console.log('📧 Frontend: Prepared booking details:', bookingDetails);
       console.log('📧 Frontend: Making API call to /api/souvenirs/send-receipt');
 
-      const response = await fetch("http://localhost:5000/api/souvenirs/send-receipt", {
+      const response = await fetch("https://voyeger2026-backend.onrender.com/api/souvenirs/send-receipt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(bookingDetails),
@@ -268,7 +268,7 @@ export default function BookingForm({ souvenir, onBack, onBookingComplete }) {
       console.log('📝 Frontend: Prepared order data:', orderData);
       console.log('📝 Frontend: Making API call to /api/souvenirs/create-order-db');
 
-      const response = await fetch("http://localhost:5000/api/souvenirs/create-order-db", {
+      const response = await fetch("https://voyeger2026-backend.onrender.com/api/souvenirs/create-order-db", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),

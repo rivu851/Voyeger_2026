@@ -94,7 +94,7 @@ const TrackLocationPage = () => {
   // --- Target Polling (Them) ---
   const fetchTrackedLocation = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/location/${userId}`);
+      const response = await fetch(`https://voyeger2026-backend.onrender.com/api/location/${userId}`);
       if (response.status === 404) {
         setTrackingExpired(true);
         setLoading(false);

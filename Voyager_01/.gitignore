@@ -17,4 +17,11 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Env
+.env
+.env.*
+
+# Cache
+.cache
+.npm
 

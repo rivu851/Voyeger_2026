@@ -1,4 +1,4 @@
-const API_BASE = "http://localhost:5000/api";
+const API_BASE = "https://voyeger2026-backend.onrender.com/api";
 let currentMonument = null;
 let currentFrame = null;
 let currentVibe = "professor"; 

@@ -103,7 +103,7 @@ export default function CreateRoom({ onClose }) {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/owner/hotel/by-email/${encodeURIComponent(
+        `https://voyeger2026-backend.onrender.com/api/owner/hotel/by-email/${encodeURIComponent(
           email
         )}`,
         {
@@ -171,7 +171,7 @@ export default function CreateRoom({ onClose }) {
       console.log("Creating rooms with data:", roomData);
 
       const response = await axios.post(
-        "http://localhost:5000/api/owner/hotel/rooms/bulkCreate",
+        "https://voyeger2026-backend.onrender.com/api/owner/hotel/rooms/bulkCreate",
         roomData,
         {
           withCredentials: true,
