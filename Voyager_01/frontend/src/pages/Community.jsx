@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Users, Plus, Search } from "lucide-react"
+import { Users, Plus, Search, Filter } from "lucide-react"
 import { Button } from "../components/ui/Button"
 import { Card, CardContent, CardHeader } from "../components/ui/card"
 import { Input } from "../components/ui/input"
@@ -12,6 +12,7 @@ import CommunityStats from "./CommunityStats"
 import { useNavigate } from "react-router-dom"
 import { useAppContext } from "../context/AppContext"
 import { useTranslation } from "react-i18next"
+import { motion, AnimatePresence } from "framer-motion"
 
 const Community = () => {
   const { t } = useTranslation();
@@ -19,9 +20,8 @@ const Community = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const { createCom, setCreateCom } = useAppContext();
-  const naviagte = useNavigate();
+  const navigate = useNavigate();
 
-  // Sample data - in real app, this would come from your backend
   const [posts, setPosts] = useState([
     {
       id: "1",
@@ -59,24 +59,6 @@ const Community = () => {
       tags: [t('community.tags.soloTravel'), t('community.tags.adventure'), t('community.tags.mountains'), t('community.tags.biking')],
       isLiked: true,
     },
-    {
-      id: "3",
-      author: {
-        name: t('community.posts.priya.name'),
-        avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8cHJvZmlsZXxlbnwwfHwwfHx8MA%3D%3D",
-        location: t('community.posts.priya.location'),
-      },
-      destination: t('community.posts.priya.destination'),
-      title: t('community.posts.priya.title'),
-      content: t('community.posts.priya.content'),
-      images: ["https://plus.unsplash.com/premium_photo-1661962428918-6a57ab674e23?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8cmFqYXN0aGFufGVufDB8fDB8fHww"],
-      category: t('community.categories.heritage'),
-      date: t('community.timeAgo.days', { count: 3 }),
-      likes: 32,
-      comments: 15,
-      tags: [t('community.tags.heritage'), t('community.tags.culture'), t('community.tags.familyTrip'), t('community.tags.palaces')],
-      isLiked: false,
-    },
   ])
 
   const categories = [
@@ -108,137 +90,116 @@ const Community = () => {
     )
   }
 
-  const handleNewPost = (newPost) => {
-    const post = {
-      ...newPost,
-      id: Date.now().toString(),
-      likes: 0,
-      comments: 0,
-      isLiked: false,
-    }
-    setPosts([post, ...posts])
-    setActiveTab("feed")
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 mt-24">
-      <div className="max-w-6xl mx-auto px-4">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">{t('community.title')}</h1>
-          <p className="text-gray-600 text-lg">
-            {t('community.subtitle')}
-          </p>
-        </div>
-        {/*Community Stats*/}
-        <CommunityStats />
-        {/* Navigation Tabs*/}
-        <div className="flex justify-center mb-8">
-          <div className="bg-white rounded-lg p-1 shadow-md">
+    <section className="py-24">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Area */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mb-20 px-4">
+          <div className="space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="h-[2px] w-12 bg-cyan-600 shadow-[0_0_15px_rgba(8,145,178,0.2)]" />
+              <span className="text-cyan-800 font-black uppercase tracking-[0.5em] text-[10px]">Transmission Hub</span>
+            </div>
+            <h2 className="text-6xl md:text-8xl font-black text-slate-950 tracking-tighter leading-none">
+              GLOBAL <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 italic">TRANSMISSIONS</span>
+            </h2>
+            <p className="text-slate-500 text-xl font-bold max-w-2xl italic leading-relaxed">
+              "Witness the echoes of the unknown, captured by the fearless voyagers of the grand frontier."
+            </p>
+          </div>
+
+          <div className="flex items-center gap-6">
             <Button
-              variant={activeTab === "feed" ? "default" : "ghost"}
               onClick={() => setActiveTab("feed")}
-              className="px-6 py-2"
+              className={`rounded-[2rem] px-10 py-8 h-auto font-black uppercase tracking-[0.2em] text-[10px] transition-all shadow-xl ${activeTab === "feed" ? "bg-slate-950 text-white shadow-slate-200" : "text-slate-500 hover:text-slate-950 bg-white border border-slate-100"
+                }`}
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users className="w-5 h-5 mr-4" />
               {t('community.tabs.feed')}
             </Button>
             <Button
-              variant={activeTab === "create" ? "default" : "ghost"}
-              onClick={() => {
-                setActiveTab("create");
-                setCreateCom(true);
-              }}
-              className="px-6 py-2"
+              onClick={() => setCreateCom(true)}
+              className="rounded-[2rem] px-10 py-8 h-auto font-black uppercase tracking-[0.2em] text-[10px] bg-cyan-600 text-white hover:bg-cyan-700 shadow-xl shadow-cyan-500/20 border-none active:scale-95 transition-all"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-5 h-5 mr-4" />
               {t('community.tabs.share')}
             </Button>
           </div>
         </div>
-        {activeTab === "feed" ? (
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-4">
-                <CardHeader>
-                  <h3 className="font-semibold text-gray-800">{t('community.filters.title')}</h3>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Search */}
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                      placeholder={t('community.filters.searchPlaceholder')}
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
 
-                  {/* Categories */}
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">{t('community.filters.categories')}</h4>
-                    <div className="space-y-2">
-                      {categories.map((category) => (
-                        <Button
-                          key={category}
-                          variant={selectedCategory === category ? "default" : "ghost"}
-                          size="sm"
-                          onClick={() => setSelectedCategory(category)}
-                          className="w-full justify-start"
-                        >
-                          {category === t('community.categories.all') ? t('community.filters.allPosts') : category}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
+        {/* Stats Section */}
+        <div className="mb-24 px-4">
+          <CommunityStats />
+        </div>
 
-                  {/* Popular Tags */}
-                  <div>
-                    <h4 className="font-medium text-gray-700 mb-2">{t('community.filters.popularTags')}</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        t('community.tags.hiddenGems'),
-                        t('community.tags.soloTravel'),
-                        t('community.tags.familyTrip'),
-                        t('community.tags.adventure'),
-                        t('community.tags.budgetTravel')
-                      ].map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          #{tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+        {/* Feed Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 px-4">
+          {/* Sidebar Filters */}
+          <aside className="lg:col-span-3 space-y-12">
+            <div className="bg-white border border-slate-100 rounded-[4rem] p-12 space-y-12 sticky top-28 shadow-xl shadow-slate-200/40">
+              <div className="space-y-10">
+                <div className="flex items-center gap-4 text-slate-400 uppercase tracking-[0.3em] text-[10px] font-black">
+                  <Search size={16} className="text-cyan-600" /> Sector Search
+                </div>
+                <div className="relative">
+                  <Input
+                    placeholder={t('community.filters.searchPlaceholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="bg-slate-50 border-slate-100 rounded-[2rem] py-7 pl-6 text-slate-900 placeholder:text-slate-400 font-black text-xs tracking-widest focus:bg-white focus:border-cyan-500/30 outline-none transition-all h-auto shadow-inner"
+                  />
+                </div>
+              </div>
 
-            {/* Main Feed */}
-            <div className="lg:col-span-3">
-              <div className="space-y-6">
-                {filteredPosts.length > 0 ? (
-                  filteredPosts.map((post) => <PostCard key={post.id} post={post} onLike={handleLike} />)
-                ) : (
-                  <Card className="text-center py-12">
-                    <CardContent>
-                      <div className="text-gray-500">
-                        <Users className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                        <h3 className="text-lg font-medium mb-2">{t('community.noPosts.title')}</h3>
-                        <p>{t('community.noPosts.message')}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
+              <div className="space-y-10">
+                <div className="flex items-center gap-4 text-slate-400 uppercase tracking-[0.3em] text-[10px] font-black">
+                  <Filter size={16} className="text-cyan-600" /> Classification
+                </div>
+                <div className="flex flex-col gap-3">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`text-left px-8 py-5 rounded-[1.5rem] font-black text-[11px] uppercase tracking-widest transition-all ${selectedCategory === category
+                        ? "bg-cyan-600 text-white shadow-lg shadow-cyan-500/30"
+                        : "text-slate-500 hover:text-slate-950 hover:bg-slate-50 border border-transparent hover:border-slate-100"
+                        }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ) : (
-          <CreatePost onSubmit={handleNewPost} />
-        )}
+          </aside>
+
+          {/* Main Content Area */}
+          <main className="lg:col-span-9">
+            <div className="grid grid-cols-1 gap-16">
+              {filteredPosts.length > 0 ? (
+                filteredPosts.map((post) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <PostCard post={post} onLike={handleLike} />
+                  </motion.div>
+                ))
+              ) : (
+                <div className="text-center py-48 bg-slate-50 rounded-[5rem] border-4 border-dashed border-slate-100 opacity-40">
+                  <Users className="w-24 h-24 mx-auto mb-10 text-slate-200" />
+                  <h3 className="text-4xl font-black text-slate-800 mb-4 uppercase tracking-tighter">Negative Signal</h3>
+                  <p className="text-slate-400 italic font-bold text-xl uppercase tracking-widest">No transmissions detected on the current frequency.</p>
+                </div>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 
