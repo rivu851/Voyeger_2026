@@ -9,10 +9,31 @@ console.log('   - EMAIL_PASSWORD length:', process.env.EMAIL_PASSWORD ? process.
 // Create transporter for Gmail
 console.log('📧 Email Service: Creating nodemailer transporter...');
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+
   auth: {
-    user: process.env.EMAIL_USER, // Your Gmail address
-    pass: process.env.EMAIL_PASSWORD // App password from Gmail
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASSWORD,
+  },
+
+  tls: {
+    rejectUnauthorized: false,
+  },
+
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
+});
+
+  
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ SMTP VERIFY FAILED');
+    console.error(error);
+  } else {
+    console.log('✅ SMTP SERVER IS READY');
   }
 });
 

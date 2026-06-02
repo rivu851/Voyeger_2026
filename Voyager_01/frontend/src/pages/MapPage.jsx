@@ -78,7 +78,15 @@ const MapPage = () => {
       );
       out center;
     `;
+<<<<<<< HEAD
     fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(overpassQuery)}`, { signal: controller.signal })
+=======
+
+  fetch(
+  `${import.meta.env.VITE_BACKEND_URL}/api/tourist-spots?lat=${coords.lat}&lon=${coords.lng}`,
+  { signal: controller.signal }
+)
+>>>>>>> 352a63b8ea30b0322cf74a2f6a2ef9f01977e82a
       .then((res) => res.json())
       .then((data) => {
         const spots = data.elements
